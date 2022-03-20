@@ -95,9 +95,9 @@ window.addEventListener('DOMContentLoaded', () => {
         function getZero(num) {
             if (num >= 0 && num <= 10) {
                 return `0${num}`;
+            } else {
+                return num;
             }
-
-            return num;
         }
 
         function updateClock() {
@@ -115,4 +115,64 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     setClock('.timer', deadline);
+
+    // Modal
+
+    // 1)
+    // Нужно получить элементы со страницы
+
+    // 2)
+    // Написать функцию, которая вызывает модальное окно
+
+    // 3)
+    // Написать функцию, которая закрывает модальное окно
+
+    const modalTrigger = document.querySelectorAll('[data-modal]'),
+        modal = document.querySelector('.modal'),
+        modalCloseBtn = document.querySelector('[data-close]');
+
+    // Вызвать модальное окно
+    function callModal() {
+        modal.classList.add('show');
+        modal.classList.remove('hide');
+        document.body.style.overflow = 'hidden';
+        clearInterval(modalTimerId);
+    }
+
+    modalTrigger.forEach(item => {
+        item.addEventListener('click', callModal);
+    });
+
+    // Закрыть модальное окно
+    function closeModal() {
+        modal.classList.add('hide');
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    modalCloseBtn.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Escape' && modal.classList.contains('show')) {
+            closeModal();
+            console.log(e);
+        }
+    });
+
+    const modalTimerId = setTimeout(callModal, 3000);
+
+    function showModalbyScroll() {
+        if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
+            callModal();
+            window.removeEventListener('scroll', showModalbyScroll);
+        }
+    }
+
+    window.addEventListener('scroll', showModalbyScroll);
 });
