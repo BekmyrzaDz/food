@@ -18,5 +18,8 @@
   "homepage": "https://github.com/BekmyrzaDz/food#readme",
   "devDependencies": {
     "json-server": "^0.17.0"
+  },
+  "jshintConfig": {
+    "esversion": 8
   }
 }
