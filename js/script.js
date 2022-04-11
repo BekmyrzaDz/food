@@ -62,7 +62,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // 3)
     // Должна быть функция, которая должна заниматься обновленим нашего времени
 
-    const deadline = '2022-03-19';
+    const deadline = '2022-05-19';
 
     // Получаем время до дедлайна
     function getTimeRamaning(getTime) {
@@ -229,9 +229,22 @@ window.addEventListener('DOMContentLoaded', () => {
         return await res.json();
     };
 
-    getResource('http://localhost:3000/menu')
+    // getResource('http://localhost:3000/menu')
+    //     .then(data => {
+    //         data.forEach(({
+    //             img,
+    //             alimg,
+    //             title,
+    //             descr,
+    //             price
+    //         }) => {
+    //             new MenuCard(img, alimg, title, descr, price, '.menu .container').render();
+    //         });
+    //     });
+
+    axios.get('http://localhost:3000/menu')
         .then(data => {
-            data.forEach(({
+            data.data.forEach(({
                 img,
                 alimg,
                 title,
@@ -336,4 +349,89 @@ window.addEventListener('DOMContentLoaded', () => {
     fetch('http://localhost:3000/menu')
         .then(data => data.json())
         .then(res => console.log(res));
+
+    // Slider
+
+    // Алгоритм задачи
+
+    // 1. Получить все элементы с котрыми мы будем работать
+    // 2. Нужен какой-то параметр, какой-то индекс, котрый будет определять наш текущий слайд.
+    // Этот индекс нужно как использовать, так и изменять т/к 
+    // мы будем кликать на стрелочки и они соответственно должны меняться
+    // 3. Создание ф-ции, который будет заниматся показом наших слайдов
+    // В нем будет включаться сразу две ф-ции
+    // Первый это показ определенного слайда
+    // Второй это скрытие других, которые мы сейчас не видем
+    // 4. Предусмотреть поведение слайдера внутри созданной ф-ции, когда мы долистаем до конца слайдера
+    // нужно будет заново попасть на первый, а если у нас показывается 
+    // первый слайд и мы нажмем на кнопку назад то мы должны начать с конца 
+    // 5. Также нужно подсчитать общее кол-во слайдеров и показывать 
+    // их динамически на сайте
+
+    const sliderCounter = document.querySelector('.offer__slider-counter'),
+        slidePrev = sliderCounter.querySelector('.offer__slider-prev'),
+        slideNext = sliderCounter.querySelector('.offer__slider-next'),
+        current = sliderCounter.querySelector('#current'),
+        total = sliderCounter.querySelector('#total'),
+        slides = document.querySelectorAll('.offer__slide');
+
+    let slideIndex = 1;
+
+    if (slides.length < 10) {
+        total.textContent = `0${slides.length}`;
+    } else {
+        total.textContent = slides.length;
+    }
+
+    // Дефолтное значение текущего слайда
+    current.textContent = '01';
+
+    function hideSlideContent() {
+        slides.forEach(item => {
+            item.classList.add('hide');
+            item.classList.remove('show', 'fade');
+        });
+    }
+
+
+    function showSlideContent(i = 0) {
+        slides[i].classList.add('show', 'fade');
+        slides[i].classList.remove('hide');
+    }
+
+    hideSlideContent();
+    showSlideContent();
+
+    // Показываем слайды на странице
+    function showSlides(num) {
+        if (num > slides.length) {
+            slideIndex = 1;
+        }
+
+        if (num < 1) {
+            slideIndex = slides.length;
+        }
+
+        hideSlideContent();
+        showSlideContent(slideIndex - 1);
+
+        if (slideIndex >= 0 && slideIndex <= 10) {
+            current.textContent = `0${slideIndex}`;
+        } else {
+            current.textContent = slideIndex;
+        }
+    }
+
+    function plusSlides(n) {
+        showSlides(slideIndex += n);
+    }
+
+    // Вешаем обработчики событий на стрелки
+    slidePrev.addEventListener('click', () => {
+        plusSlides(-1);
+    });
+
+    slideNext.addEventListener('click', () => {
+        plusSlides(1);
+    });
 });
