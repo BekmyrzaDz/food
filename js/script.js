@@ -352,31 +352,81 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Slider
 
-    // Алгоритм задачи
-
-    // 1. Получить все элементы с котрыми мы будем работать
-    // 2. Нужен какой-то параметр, какой-то индекс, котрый будет определять наш текущий слайд.
-    // Этот индекс нужно как использовать, так и изменять т/к 
-    // мы будем кликать на стрелочки и они соответственно должны меняться
-    // 3. Создание ф-ции, который будет заниматся показом наших слайдов
-    // В нем будет включаться сразу две ф-ции
-    // Первый это показ определенного слайда
-    // Второй это скрытие других, которые мы сейчас не видем
-    // 4. Предусмотреть поведение слайдера внутри созданной ф-ции, когда мы долистаем до конца слайдера
-    // нужно будет заново попасть на первый, а если у нас показывается 
-    // первый слайд и мы нажмем на кнопку назад то мы должны начать с конца 
-    // 5. Также нужно подсчитать общее кол-во слайдеров и показывать 
-    // их динамически на сайте
-
     const sliderCounter = document.querySelector('.offer__slider-counter'),
         slidePrev = sliderCounter.querySelector('.offer__slider-prev'),
         slideNext = sliderCounter.querySelector('.offer__slider-next'),
         current = sliderCounter.querySelector('#current'),
         total = sliderCounter.querySelector('#total'),
-        slides = document.querySelectorAll('.offer__slide');
+        slides = document.querySelectorAll('.offer__slide'),
+        slidesWrapper = document.querySelector('.offer__slider-wrapper'),
+        slidesField = slidesWrapper.querySelector('.offer__slider-inner'),
+        width = window.getComputedStyle(slidesWrapper).width;
 
     let slideIndex = 1;
+    let offset = 0;
 
+    if (slides.length < 10) {
+        total.textContent = `0${slides.length}`;
+    } else {
+        total.textContent = slides.length;
+    }
+
+    slidesField.style.width = 100 * slides.length + '%';
+
+    slides.forEach(slide => {
+        slide.style.width = width;
+    });
+
+    slidesField.style.display = 'flex';
+    slidesField.style.transition = '0.5s all';
+
+    slidesWrapper.style.overflow = 'hidden';
+
+    slideNext.addEventListener('click', () => {
+        if (offset == +width.slice(0, width.length - 2) * (slides.length - 1)) {
+            offset = 0;
+        } else {
+            offset += +width.slice(0, width.length - 2);
+        }
+
+        slidesField.style.transform = `translateX(-${offset}px)`;
+
+        if (slideIndex == slides.length) {
+            slideIndex = 1;
+        } else {
+            slideIndex++;
+        }
+
+        if (slides.length < 10) {
+            current.textContent = `0${slideIndex}`;
+        } else {
+            current.textContent = slideIndex;
+        }
+    });
+
+    slidePrev.addEventListener('click', () => {
+        if (offset == 0) {
+            offset = +width.slice(0, width.length - 2) * (slides.length - 1);
+        } else {
+            offset -= +width.slice(0, width.length - 2);
+        }
+
+        slidesField.style.transform = `translateX(-${offset}px)`;
+
+        if (slideIndex == 1) {
+            slideIndex = slides.length;
+        } else {
+            slideIndex--;
+        }
+
+        if (slides.length < 10) {
+            current.textContent = `0${slideIndex}`;
+        } else {
+            current.textContent = slideIndex;
+        }
+    });
+
+    /* 
     if (slides.length < 10) {
         total.textContent = `0${slides.length}`;
     } else {
@@ -392,7 +442,6 @@ window.addEventListener('DOMContentLoaded', () => {
             item.classList.remove('show', 'fade');
         });
     }
-
 
     function showSlideContent(i = 0) {
         slides[i].classList.add('show', 'fade');
@@ -434,4 +483,5 @@ window.addEventListener('DOMContentLoaded', () => {
     slideNext.addEventListener('click', () => {
         plusSlides(1);
     });
+    */
 });
