@@ -346,13 +346,14 @@ window.addEventListener('DOMContentLoaded', () => {
         }, 4000);
     }
 
-    fetch('http://localhost:3000/menu')
-        .then(data => data.json())
-        .then(res => console.log(res));
+    // fetch('http://localhost:3000/menu')
+    //     .then(data => data.json())
+    //     .then(res => console.log(res));
 
     // Slider
 
     const sliderCounter = document.querySelector('.offer__slider-counter'),
+        slider = document.querySelector('.offer__slider'),
         slidePrev = sliderCounter.querySelector('.offer__slider-prev'),
         slideNext = sliderCounter.querySelector('.offer__slider-next'),
         current = sliderCounter.querySelector('#current'),
@@ -382,6 +383,72 @@ window.addEventListener('DOMContentLoaded', () => {
 
     slidesWrapper.style.overflow = 'hidden';
 
+    current.textContent = `0${slideIndex}`;
+
+    // Dot
+    /*
+    1. Получить родитель слайдера, и установить position: relative
+
+    2. Создать обертку для точек. При помощи цикла
+    или перебирающего метода создавать количество точек, которое
+    будет равно количеству слайдов на сайте. При этом каждой точке
+    нужно будет устанавливать характерный признак, какой-то атрибут,
+    что первая точка ведет нас к первому слайду, четвертая к четвертому.
+    Сделать класс активности, чтобы четко понимать какой класс сейчас
+    активен.
+
+    3. Когда мы будем кликать на каждую из точек, мы будем перемещаться на
+    соответствующий слайд. 
+    */
+
+    // Задаем относительное позиционирование для родителя слайдера
+    slider.style.position = 'relative';
+
+    // Обёртка для точек
+    const indicators = document.createElement('ol'),
+        dots = [];
+
+    indicators.classList.add('carousel-indicators');
+    indicators.style.cssText = `
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 15;
+        display: flex;
+        justify-content: center;
+        margin-right: 15%;
+        margin-left: 15%;
+        list-style: none;
+    `;
+    slider.append(indicators);
+
+    for (let i = 0; i < slides.length; i++) {
+        let dot = document.createElement('li');
+        dot.setAttribute('data-slide-to', i + 1);
+        dot.style.cssText = `
+            box-sizing: content-box;
+            flex: 0 1 auto;
+            width: 30px;
+            height: 6px;
+            margin-right: 3px;
+            margin-left: 3px;
+            cursor: pointer;
+            background-color: #fff;
+            background-clip: padding-box;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            opacity: .5;
+            transition: opacity .6s ease;
+        `;
+        if (i == 0) {
+            dot.style.opacity = 1;
+        }
+        indicators.append(dot);
+        dots.push(dot);
+    }
+
+    // Логика стрелок вперед и назад
     slideNext.addEventListener('click', () => {
         if (offset == +width.slice(0, width.length - 2) * (slides.length - 1)) {
             offset = 0;
@@ -402,6 +469,9 @@ window.addEventListener('DOMContentLoaded', () => {
         } else {
             current.textContent = slideIndex;
         }
+
+        dots.forEach(dot => dot.style.opacity = '.5');
+        dots[slideIndex - 1].style.opacity = 1;
     });
 
     slidePrev.addEventListener('click', () => {
@@ -424,6 +494,33 @@ window.addEventListener('DOMContentLoaded', () => {
         } else {
             current.textContent = slideIndex;
         }
+
+        dots.forEach(dot => dot.style.opacity = '.5');
+        dots[slideIndex - 1].style.opacity = 1;
+    });
+
+    // Проробатываем логику точек
+    dots.forEach(dot => {
+        dot.addEventListener('click', (e) => {
+            // Можно сделать и таким способом
+            // const slideTo = e.target.getAttribute('data-slide-to');
+
+            offset = +width.slice(0, width.length - 2) * (dot.dataset.slideTo - 1);
+            // offset = +width.slice(0, width.length - 2) * (slideTo - 1);
+
+            slidesField.style.transform = `translateX(-${offset}px)`;
+            slideIndex = dot.dataset.slideTo;
+            // slideIndex = slideTo;
+
+            if (slides.length < 10) {
+                current.textContent = `0${slideIndex}`;
+            } else {
+                current.textContent = slideIndex;
+            }
+
+            dots.forEach(dot => dot.style.opacity = '.5');
+            dots[slideIndex - 1].style.opacity = 1;
+        });
     });
 
     /* 
