@@ -448,12 +448,23 @@ window.addEventListener('DOMContentLoaded', () => {
         dots.push(dot);
     }
 
+    // Подсветка активной точки
+    function active() {
+        dots.forEach(dot => dot.style.opacity = '.5');
+        dots[slideIndex - 1].style.opacity = 1;
+    }
+
+    // Избавляемся от лишних строк
+    function deleteNotDigits(str) {
+        return +str.replace(/\D/ig, '');
+    }
+
     // Логика стрелок вперед и назад
     slideNext.addEventListener('click', () => {
-        if (offset == +width.slice(0, width.length - 2) * (slides.length - 1)) {
+        if (offset == deleteNotDigits(width) * (slides.length - 1)) {
             offset = 0;
         } else {
-            offset += +width.slice(0, width.length - 2);
+            offset += deleteNotDigits(width);
         }
 
         slidesField.style.transform = `translateX(-${offset}px)`;
@@ -470,15 +481,14 @@ window.addEventListener('DOMContentLoaded', () => {
             current.textContent = slideIndex;
         }
 
-        dots.forEach(dot => dot.style.opacity = '.5');
-        dots[slideIndex - 1].style.opacity = 1;
+        active();
     });
 
     slidePrev.addEventListener('click', () => {
         if (offset == 0) {
-            offset = +width.slice(0, width.length - 2) * (slides.length - 1);
+            offset = deleteNotDigits(width) * (slides.length - 1);
         } else {
-            offset -= +width.slice(0, width.length - 2);
+            offset -= deleteNotDigits(width);
         }
 
         slidesField.style.transform = `translateX(-${offset}px)`;
@@ -495,8 +505,7 @@ window.addEventListener('DOMContentLoaded', () => {
             current.textContent = slideIndex;
         }
 
-        dots.forEach(dot => dot.style.opacity = '.5');
-        dots[slideIndex - 1].style.opacity = 1;
+        active();
     });
 
     // Проробатываем логику точек
@@ -505,7 +514,7 @@ window.addEventListener('DOMContentLoaded', () => {
             // Можно сделать и таким способом
             // const slideTo = e.target.getAttribute('data-slide-to');
 
-            offset = +width.slice(0, width.length - 2) * (dot.dataset.slideTo - 1);
+            offset = deleteNotDigits(width) * (dot.dataset.slideTo - 1);
             // offset = +width.slice(0, width.length - 2) * (slideTo - 1);
 
             slidesField.style.transform = `translateX(-${offset}px)`;
@@ -518,8 +527,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 current.textContent = slideIndex;
             }
 
-            dots.forEach(dot => dot.style.opacity = '.5');
-            dots[slideIndex - 1].style.opacity = 1;
+            active();
         });
     });
 
